@@ -21,10 +21,22 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Find Flutter project folder
+        id: proj
+        run: |
+          P=$(find . -maxdepth 3 -name pubspec.yaml -not -path "*/.*" | head -n 1)
+          if [ -z "$P" ]; then echo "pubspec.yaml nahi mili. Repo ki files:"; ls -R | head -50; exit 1; fi
+          DIR=$(dirname "$P")
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+          echo "Project folder: $DIR"
+
       - run: flutter pub get
+        working-directory: ${{ steps.proj.outputs.dir }}
+
       - run: flutter build apk --release
+        working-directory: ${{ steps.proj.outputs.dir }}
 
       - uses: actions/upload-artifact@v4
         with:
           name: ludo-rush-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ${{ steps.proj.outputs.dir }}/build/app/outputs/flutter-apk/app-release.apk
