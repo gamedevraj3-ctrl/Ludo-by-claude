@@ -21,6 +21,11 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Extract source zip (agar repo me sirf zip hai)
+        run: |
+          Z=$(find . -maxdepth 2 -name "*.zip" | head -n 1)
+          if [ -n "$Z" ] && [ ! -f pubspec.yaml ]; then unzip -q -o "$Z" -d src_extracted; fi
+
       - name: Find Flutter project folder
         id: proj
         run: |
